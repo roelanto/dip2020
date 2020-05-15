@@ -6,10 +6,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Hello world!
@@ -53,22 +50,11 @@ public class DIPKafkaConsumer extends Thread {
     }
 
 
-    private int resolve_query_1(Transaction transaction, int threshold) {
-        Set<Integer> allProductsForCustomer = transactions.productsByCustomer(transaction.getCustomerId());
-        Map<Integer, Integer> customers = transactions.customersWithProduct(allProductsForCustomer);
-        Iterator iter = customers.entrySet().iterator();
-        int resultval = 0;
-        while (iter.hasNext()) {
-            Map.Entry<Integer, Integer> customerCountPair = (Map.Entry<Integer, Integer>) iter.next();
-            if (customerCountPair.getKey() != transaction.getCustomerId()) {
-                if (customerCountPair.getValue() > threshold) {
-                    log.info("Customer " + customerCountPair.getKey() + "  shares " + customerCountPair.getValue() + " identical products with customer " +
-                            transaction.getCustomerId());
-                    resultval ++;
-                }
-            }
-        }
-        return resultval;
+    private int resolve_query(Transaction transaction) {
+        String customerId = transaction.getCustomerId();
+
+        Set<Integer> users = transactions.usersFromCompany(customerId);
+        return users.size();
     }
 
     /**
@@ -83,12 +69,12 @@ public class DIPKafkaConsumer extends Thread {
                 ConsumerRecords<String, String> records = consumer.poll(100);
                 for (ConsumerRecord<String, String> record : records)
                 {
-                    log.info("topic = "+record.topic() + " partition = "+record.partition()+", offset = %d, customer = "+record.key()+", productid = "+record.value()+"\n");
-                    Transaction t = new Transaction(Integer.parseInt(record.key()), Integer.parseInt(record.value()));
+                    log.info("topic = "+record.topic() + " partition = "+record.partition()+", offset = %d, userid = "+record.key()+", companyid = "+record.value()+"\n");
+                    Transaction t = new Transaction(record.value(), Integer.parseInt(record.key()));
                     // add transaction to the list of known transactions
                     transactions.add(t);
-                    // run query 1
-                    log.info("# of customers with threshold > " + threshold + ": " + resolve_query_1(t, threshold));
+                    // run query
+                    log.info("# of users for company" + t.getCustomerId() + ": " + resolve_query(t));
 
                     int updatedCount = 1;
                 }

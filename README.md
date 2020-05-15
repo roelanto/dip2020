@@ -124,19 +124,19 @@ Als alles goed is, zie je vervolgens de output van de consumer:
 
 De consumer luistert naar topic `transactie`. Om dat topic te vullen vanuit de flickbike-data, kun je de standaard console-producer gebruiken:
 
-`bin/kafka-console-producer.sh --broker-list localhost:9092 --topic transactie --property "parse.key=true" --property "key.separator=: /tmp/output.large`
+`bin/kafka-console-producer.sh --broker-list localhost:9092 --topic transactie --property "parse.key=true" --property "key.separator=," /tmp/output.large`
 
 De producer vraagt vervolgens om een key-value pair: `[bedrijfsid]:[userid]`. Voorbeeld om klanten 1 (twee ritten), 2, en 3 (allebei: een rit) toe te voegen die respectievelijk bij bedrijven AT, AT en AZ werken:
 
 ```
-(base) RAOs-Mac:kafka_2.12-2.4.0 roelant$ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic transactie --property "parse.key=true" --property "key.separator=:"
->1:AT
->2:AT
->3:AX
->1:AT
+(base) RAOs-Mac:kafka_2.12-2.4.0 roelant$ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic transactie --property "parse.key=true" --property "key.separator=,"
+>1,AT
+>2,AT
+>3,AX
+>1,AT
 ```
 
-Je kunt eenvoudig de juiste informatie uit de fiets-database halen (zie (https://canvas.hu.nl/files/850822/download?download_frd=1)[https://canvas.hu.nl/files/850822/download?download_frd=1]) door middel van het UNIX shell-commando:
+Je kunt eenvoudig de juiste informatie uit de fiets-database halen (zie [de dataset op Canvas](https://canvas.hu.nl/files/850822/download?download_frd=1)) door middel van het UNIX shell-commando:
 
 ```
 tail -n +2  bikes.csv | cut -f 3,5 -d "," - | sed "s/\\\"//g"
