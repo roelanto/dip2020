@@ -162,7 +162,7 @@ Je kunt die data vervolgens als input gebruiken voor de console-producer:
 
 ```
 (base) RAOs-Mac:kafka_2.12-2.4.0 roelant$ tail -n +2  bikes.csv | cut -f 3,5 -d "," - | sed "s/\\\"//g" > /tmp/output
-(base) RAOs-Mac:kafka_2.12-2.4.0 roelant$ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic transactie --property "parse.key=true" --property "key.separator=:" < /tmp/output
+(base) RAOs-Mac:kafka_2.12-2.4.0 roelant$ bin/kafka-console-producer.sh --broker-list localhost:9092 --topic transactie --property "parse.key=true" --property "key.separator=," < /tmp/output
 ```
 
 Let op: deze consumer maakt in het geheugen structuren aan (zie de class `Transactions`) om het resultaat van de query te berekenen. In het echt schaalt dit natuurlijk niet, en zou je daar een andere Kafka-topic of een andere persistentie-oplossing voor gebruiken. 
